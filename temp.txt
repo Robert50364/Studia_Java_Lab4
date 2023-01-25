@@ -1,0 +1,15 @@
+try {
+            if(1 == 1)
+            {
+                System.out.println("Prąd OK");
+                l_energy.setFill(Paint.valueOf("Green"));
+            }else{
+                throw new Exp();
+            }
+
+            } catch (Exp e) {
+                 System.out.println("Err");
+            }
+        finally {
+            System.out.println("Finaly\n");
+        }
