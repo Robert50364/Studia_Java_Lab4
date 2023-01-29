@@ -9,6 +9,8 @@ import javafx.scene.control.Label;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Circle;
 
+import java.nio.file.FileAlreadyExistsException;
+
 public class Text_checker {
 
     @FXML
@@ -38,10 +40,7 @@ public class Text_checker {
     @FXML
     private Button tb_wirniki;
 
-    boolean energyVal = false;
-    boolean ciagVal = false;
-    boolean wirnikiVal = false;
-    boolean engineWork = false;
+    private PlaneSystemCheck pSC = new PlaneSystemCheck();
 
     public void error_window(String description)
     {
@@ -60,6 +59,19 @@ public class Text_checker {
         win.setContentText("Engine was start correct");
         win.showAndWait();
     }
+
+    private void EngineStop()
+    {
+        pSC.setEngineWorkStatus(false);
+        pSC.setEnergyStatus(false);
+        pSC.setCiagStatus(false);
+        pSC.setWirnikiStatus(false);
+        l_energy.setFill(Paint.valueOf("c3c9cd"));
+        l_ciag.setFill(Paint.valueOf("c3c9cd"));
+        l_wirniki.setFill(Paint.valueOf("c3c9cd"));
+        b_send.setText("Start");
+    }
+
     @FXML
     void b_exit_action(ActionEvent event)
     {
@@ -69,86 +81,66 @@ public class Text_checker {
     @FXML
     void b_send_action(ActionEvent event)
     {
-        if(engineWork == false) {
+        if(!pSC.getEngineWrokStatus()) {
             try {
-                if (energyVal) {
-                    System.out.println("Prąd OK");
-                } else {
-                    throw new Exp("Brak prądu");
-                }
+                pSC.systemModuleCheck(0);
+                pSC.systemModuleCheck(1);
+                pSC.systemModuleCheck(2);
+                pSC.systemModuleCheck(3);
 
-                if (ciagVal) {
-                    System.out.println("Ciag OK");
-                } else {
-                    throw new Exp2("Brak ciągu");
-                }
-
-                if (wirnikiVal) {
-                    System.out.println("Wirniki OK");
-                } else {
-                    throw new Exp3("Wirniki wyłączone");
-                }
-
-                if (energyVal && ciagVal && wirnikiVal) {
-                    engineWork = true;
+                if (pSC.getEngineWrokStatus()) {
                     b_send.setText("Stop");
                     start_window();
                 }
-            } catch (Exp2 e) {
+            } catch (CiagMissExcepiton e) {
                 error_window(e.getMessage());
-            } catch (Exp3 e) {
+            } catch (WirnikiMissException e) {
                 error_window(e.getMessage());
-            } catch (Exp e) {
+            } catch (CoreSystemMissException e) {
                 error_window(e.getMessage());
             }
         }else{
-            engineWork = false;
-            energyVal = false;
-            ciagVal = false;
-            wirnikiVal = false;
-            l_energy.setFill(Paint.valueOf("c3c9cd"));
-            l_ciag.setFill(Paint.valueOf("c3c9cd"));
-            l_wirniki.setFill(Paint.valueOf("c3c9cd"));
-            b_send.setText("Start");
+            EngineStop();
         }
     }
 
+    //Button Functions
     @FXML
     void tb_ciag_action(ActionEvent event)
     {
-        if(ciagVal)
+        if(pSC.getCiagStatus())
         {
             l_ciag.setFill(Paint.valueOf("c3c9cd"));
-            ciagVal = false;
+            pSC.setCiagStatus(false);
         }else {
             l_ciag.setFill(Paint.valueOf("Green"));
-            ciagVal = true;
+            pSC.setCiagStatus(true);
         }
     }
 
     @FXML
     void tb_energy_action(ActionEvent event)
     {
-        if(energyVal)
+        if(pSC.getEnergyStatus())
         {
             l_energy.setFill(Paint.valueOf("c3c9cd"));
-            energyVal = false;
+            pSC.setEnergyStatus(false);
         }else {
             l_energy.setFill(Paint.valueOf("Green"));
-            energyVal = true;
+            pSC.setEnergyStatus(true);
         }
     }
 
     @FXML
     void tb_wirniki_action(ActionEvent event)
     {
-        if(wirnikiVal)
+        if(pSC.getWirnikiStatus())
         {
             l_wirniki.setFill(Paint.valueOf("c3c9cd"));
-            wirnikiVal = false;
+            pSC.setWirnikiStatus(false);
         }else {
             l_wirniki.setFill(Paint.valueOf("Green"));
-            wirnikiVal = true;
+            pSC.setWirnikiStatus(true);
         }
     }
 
